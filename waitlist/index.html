@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeMUNi — The Delegate's Desk · Join the Waitlist</title>
+  <meta name="description" content="GeMUNi is an AI-powered research and preparation platform for Model United Nations delegates. Join the waitlist for your seat at the table." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Caveat:wght@400;600&family=Special+Elite&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="config.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+  <div class="page-frame">
+    <header class="leather-band">
+      <div class="band-inner">
+        <div class="emblem" aria-hidden="true">
+          <svg viewBox="0 0 100 120" role="img">
+            <defs>
+              <linearGradient id="goldShine" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#E8C96A"/>
+                <stop offset="0.5" stop-color="#D3A625"/>
+                <stop offset="1" stop-color="#9C7A1E"/>
+              </linearGradient>
+            </defs>
+            <path d="M50 4 L92 18 V62 C92 90 74 108 50 116 C26 108 8 90 8 62 V18 Z" fill="url(#goldShine)" stroke="#8C1A1A" stroke-width="4"/>
+            <path d="M50 12 L86 24 V60 C86 84 70 100 50 108 C30 100 14 84 14 60 V24 Z" fill="#6B0F0F"/>
+            <path d="M50 22 L78 32 V60 C78 80 66 92 50 100 C34 92 22 80 22 60 V32 Z" fill="none" stroke="url(#goldShine)" stroke-width="2"/>
+            <path d="M36 52 Q50 40 64 52 L60 78 Q50 84 40 78 Z" fill="url(#goldShine)"/>
+            <path d="M32 48 Q50 34 68 48" fill="none" stroke="url(#goldShine)" stroke-width="3" stroke-linecap="round"/>
+            <path d="M38 58 Q50 52 62 58" fill="none" stroke="url(#goldShine)" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="50" cy="42" r="3.5" fill="#8C1A1A"/>
+          </svg>
+        </div>
+        <p class="wordmark">GeMUNi</p>
+        <p class="wordmark-sub">THE DELEGATE'S DESK</p>
+      </div>
+    </header>
+
+    <main class="parchment">
+      <section class="hero">
+        <div class="tape tape-left" aria-hidden="true">RESERVED</div>
+        <div class="hero-inner">
+          <p class="eyebrow">AN AI RESEARCH &amp; PREPARATION PLATFORM</p>
+          <h1 class="hero-title">Your Seat at<br/><em>the Table</em> Awaits</h1>
+          <p class="hero-sub">
+            GeMUNi turns scattered UN reports, treaties and statements into
+            clear, actionable insight — so you prepare like a seasoned delegate,
+            not a night-before one.
+          </p>
+          <div class="ornate-divider" aria-hidden="true">
+            <span class="line"></span>
+            <span class="laurel">&#10086;</span>
+            <span class="line"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="content">
+        <div class="pitch">
+          <div class="polaroid rotate-l">
+            <div class="polaroid-img stamp-approved">
+              <span class="mini-emblem" aria-hidden="true">&#9889;</span>
+            </div>
+            <p class="polaroid-note">Country research, distilled</p>
+          </div>
+          <div class="polaroid rotate-r">
+            <div class="polaroid-img stamp-secret">
+              <span class="mini-emblem" aria-hidden="true">&#9998;</span>
+            </div>
+            <p class="polaroid-note">Position papers &amp; speeches</p>
+          </div>
+          <div class="polaroid rotate-l2">
+            <div class="polaroid-img stamp-confirmed">
+              <span class="mini-emblem" aria-hidden="true">&#9878;</span>
+            </div>
+            <p class="polaroid-note">Debate practice, any time</p>
+          </div>
+          <p class="handwritten">trained on your committee, your agenda…</p>
+        </div>
+
+        <div class="form-card" id="formCard">
+          <div class="tape tape-top" aria-hidden="true"></div>
+          <h2 class="form-title">Join the <em>Waitlist</em></h2>
+          <p class="form-sub">Be first in line when the chamber opens.</p>
+
+          <form id="waitlistForm" novalidate>
+            <label class="field">
+              <span class="field-label">Delegation name</span>
+              <input type="text" id="name" name="name" placeholder="e.g. Ayesha Rahman" autocomplete="name" required />
+            </label>
+            <label class="field">
+              <span class="field-label">Correspondence address</span>
+              <input type="email" id="email" name="email" placeholder="e.g. ayesha@university.edu" autocomplete="email" required />
+            </label>
+            <label class="field">
+              <span class="field-label">A message to the chair</span>
+              <textarea id="message" name="message" rows="4" placeholder="Committees you favour, your delegation, what you hope GeMUNi will help you with…" required></textarea>
+            </label>
+            <button type="submit" class="submit-btn" id="submitBtn">
+              <span class="btn-text">Submit to the Chair</span>
+            </button>
+            <p class="form-error" id="formError" hidden></p>
+          </form>
+
+          <div class="success hidden" id="success" aria-live="polite">
+            <div class="stamp stamp-big">WELCOME<br/>TO THE<br/>DELEGATION</div>
+            <p class="success-title">Seat reserved, delegate.</p>
+            <p class="success-sub">Your parchment is in the registry. Keep an eye on your correspondence — we'll summon you when the chamber opens.</p>
+            <p class="handwritten note">— the GeMUNi secretariat</p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p class="footline">&#10086;&nbsp;&nbsp;GEMUNI · THE DELEGATE'S DESK&nbsp;&nbsp;&#10086;</p>
+        <p class="footnote">Research the world. Represent it better.</p>
+      </footer>
+    </main>
+  </div>
+
+  <div class="tape tape-corner" aria-hidden="true"></div>
+</body>
+</html>
