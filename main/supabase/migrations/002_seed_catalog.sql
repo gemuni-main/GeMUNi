@@ -1,0 +1,80 @@
+-- Plans
+insert into plans (name, tier, daily_research_limit, monthly_token_budget, price_usd) values
+  ('Free', 'free', 10, 250000, 0),
+  ('Plus', 'plus', 25, 2000000, 20),
+  ('Pro', 'pro', 50, 10000000, 60);
+
+-- Countries (subset; full list added via admin later)
+insert into countries (name, official_name, iso_code, region, aliases) values
+  ('China', 'People''s Republic of China', 'CN', 'Asia-Pacific', array['PRC','China PR']),
+  ('United States', 'United States of America', 'US', 'Americas', array['USA','United States of America']),
+  ('United Kingdom', 'United Kingdom of Great Britain and Northern Ireland', 'GB', 'Europe', array['UK','Great Britain','Britain']),
+  ('France', 'French Republic', 'FR', 'Europe', array['French Republic']),
+  ('Russia', 'Russian Federation', 'RU', 'Europe', array['Russian Federation']),
+  ('Germany', 'Federal Republic of Germany', 'DE', 'Europe', array['Federal Republic of Germany']),
+  ('India', 'Republic of India', 'IN', 'Asia-Pacific', array['Republic of India']),
+  ('Brazil', 'Federative Republic of Brazil', 'BR', 'Americas', array['Federative Republic of Brazil']),
+  ('Japan', 'Japan', 'JP', 'Asia-Pacific', array[]::text[]),
+  ('Nigeria', 'Federal Republic of Nigeria', 'NG', 'Africa', array['Federal Republic of Nigeria']);
+
+-- Committees
+insert into committees (id, name, abbreviation, description, type, mandate, powers, typical_topics, procedural_rules) values
+  ('00000000-0000-0000-0000-000000000001',
+   'United Nations Security Council', 'UNSC',
+   'Maintenance of international peace and security',
+   'Security Council',
+   'Primary responsibility for the maintenance of international peace and security (UN Charter Chapter V-VII)',
+   array['Binding resolutions under Chapter VII','Sanctions','Authorizing use of force','Peacekeeping mandates'],
+   array['Peace and security','Conflict prevention','Sanctions regimes','Peacekeeping operations'],
+   'Rotating presidency monthly; 9 of 15 votes to pass; P5 veto'),
+  ('00000000-0000-0000-0000-000000000002',
+   'United Nations Human Rights Council', 'UNHRC',
+   'Promotion and protection of human rights worldwide',
+   'Human Rights Council',
+   'Address human rights violations and make recommendations (UN Charter Article 68)',
+   array['Universal Periodic Review','Special procedures','Resolution adoption','Country mandates'],
+   array['Human rights','Civil liberties','Refugee protection','Gender equality'],
+   '47 members elected by the General Assembly; simple majority for resolutions'),
+  ('00000000-0000-0000-0000-000000000003',
+   'First Committee (Disarmament and International Security)', 'GA1 DISEC',
+   'Disarmament, global challenges and threats to peace',
+   'General Assembly Committee',
+   'Disarmament and international security matters (UN Charter Article 11)',
+   array['Non-binding resolutions','Thematic debates','Reports to the General Assembly'],
+   array['Disarmament','Arms control','Nuclear non-proliferation','Emerging weapons technologies'],
+   '193 members; simple majority; no veto'),
+  ('00000000-0000-0000-0000-000000000004',
+   'World Health Organization Executive Board', 'WHO EB',
+   'International public health policy',
+   'Specialized Agency',
+   'Health policy direction and oversight of the World Health Assembly',
+   array['Health resolutions','Programme oversight','Emergency declarations'],
+   array['Pandemic preparedness','Health equity','Non-communicable diseases','Health systems'],
+   '34 technically qualified members elected for three-year terms');
+
+-- Agendas
+insert into agendas (title, description, committee_id, keywords, relevant_treaties, relevant_un_bodies) values
+  ('Addressing the global impact of food insecurity caused by climate change',
+   'Climate-driven disruptions to food systems, supply chains, and agricultural resilience, and international coordination to mitigate them.',
+   '00000000-0000-0000-0000-000000000002',
+   array['food security','climate change','agriculture','supply chains'],
+   array['Paris Agreement','UNFCCC','WTO Agreement on Agriculture'],
+   array['FAO','WFP','IFAD','IPCC']),
+  ('Strengthening the protection of civilians in armed conflict',
+   'Civilian protection in conflict zones, compliance with international humanitarian law, and accountability mechanisms.',
+   '00000000-0000-0000-0000-000000000001',
+   array['civilian protection','armed conflict','IHL','accountability'],
+   array['Geneva Conventions','Additional Protocol II','Rome Statute'],
+   array['ICRC','OHCHR','UNHCR','ICC']),
+  ('Tackling the proliferation of autonomous weapons systems',
+   'Addressing risks posed by lethal autonomous weapons, normative frameworks, and human control requirements.',
+   '00000000-0000-0000-0000-000000000003',
+   array['autonomous weapons','LAWS','AI','arms control'],
+   array['CCW','Geneva Conventions'],
+   array['GGE LAWS','UNODA','ICRC']),
+  ('Pandemic prevention, preparedness, and response',
+   'Global health security architecture, equitable access to vaccines and countermeasures, and resilient health systems.',
+   '00000000-0000-0000-0000-000000000004',
+   array['pandemic','health security','vaccines','WHO reform'],
+   array['International Health Regulations','WHO Constitution'],
+   array['WHO','WHA','CEPI','GAVI']);
