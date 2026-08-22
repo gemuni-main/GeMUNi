@@ -115,7 +115,6 @@ export async function runResearchPipeline(researchItemId: string): Promise<void>
 async function getResearchItem(researchItemId: string) {
   return prisma.research_items.findUnique({
     where: { id: researchItemId },
-    include: { country: true, committee: true, agenda: true },
   })
 }
 

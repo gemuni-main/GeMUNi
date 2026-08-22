@@ -1,5 +1,5 @@
 import { ModelId, TaskCapability } from "@/types/shared"
-import { env } from "@/lib/env"
+import { env, isProviderConfigured } from "@/lib/env"
 
 export interface LLMMessage {
   role: "system" | "user" | "assistant"
@@ -55,6 +55,7 @@ class GeminiProvider implements LLMProvider {
 
   async generate(messages: LLMMessage[], options: LLMOptions = {}): Promise<LLMResponse> {
     const opts = { ...DEFAULT_OPTIONS, ...options }
+    if (!isProviderConfigured("gemini")) throw new Error("Gemini provider not configured")
 
     try {
       const response = await fetch(
@@ -102,7 +103,7 @@ class GeminiProvider implements LLMProvider {
       }
     } catch (error) {
       console.error("Gemini generation failed:", error)
-      return this.getMockResponse(messages, options)
+      throw error instanceof Error ? error : new Error(String(error))
     }
   }
 
@@ -115,13 +116,6 @@ class GeminiProvider implements LLMProvider {
     }
   }
 
-  private getMockResponse(messages: LLMMessage[], options: LLMOptions): LLMResponse {
-    return {
-      content: `[MOCK GEMINI] This is a mock response for: ${messages[messages.length - 1].content}`,
-      usage: { inputTokens: 100, outputTokens: 50, totalTokens: 150 },
-      model: this.model,
-    }
-  }
 }
 
 class KimiProvider implements LLMProvider {
@@ -142,6 +136,7 @@ class KimiProvider implements LLMProvider {
 
   async generate(messages: LLMMessage[], options: LLMOptions = {}): Promise<LLMResponse> {
     const opts = { ...DEFAULT_OPTIONS, ...options }
+    if (!isProviderConfigured("kimi")) throw new Error("Kimi provider not configured")
 
     try {
       const response = await fetch("https://api.moonshot.cn/v1/chat/completions", {
@@ -178,7 +173,7 @@ class KimiProvider implements LLMProvider {
       }
     } catch (error) {
       console.error("Kimi generation failed:", error)
-      return this.getMockResponse(messages, options)
+      throw error instanceof Error ? error : new Error(String(error))
     }
   }
 
@@ -191,13 +186,6 @@ class KimiProvider implements LLMProvider {
     }
   }
 
-  private getMockResponse(messages: LLMMessage[], options: LLMOptions): LLMResponse {
-    return {
-      content: `[MOCK KIMI] This is a mock response for: ${messages[messages.length - 1].content}`,
-      usage: { inputTokens: 100, outputTokens: 50, totalTokens: 150 },
-      model: this.model,
-    }
-  }
 }
 
 class OpenRouterProvider implements LLMProvider {
@@ -218,6 +206,7 @@ class OpenRouterProvider implements LLMProvider {
 
   async generate(messages: LLMMessage[], options: LLMOptions = {}): Promise<LLMResponse> {
     const opts = { ...DEFAULT_OPTIONS, ...options }
+    if (!isProviderConfigured("openrouter")) throw new Error("OpenRouter provider not configured")
 
     try {
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -229,7 +218,7 @@ class OpenRouterProvider implements LLMProvider {
           "X-Title": "GeMUNi",
         },
         body: JSON.stringify({
-          model: "anthropic/claude-3.5-sonnet",
+          model: process.env.OPENROUTER_MODEL || "anthropic/claude-sonnet-5",
           messages: messages.map((m) => ({ role: m.role, content: m.content })),
           temperature: opts.temperature,
           max_tokens: opts.maxTokens,
@@ -256,7 +245,7 @@ class OpenRouterProvider implements LLMProvider {
       }
     } catch (error) {
       console.error("OpenRouter generation failed:", error)
-      return this.getMockResponse(messages, options)
+      throw error instanceof Error ? error : new Error(String(error))
     }
   }
 
@@ -269,13 +258,6 @@ class OpenRouterProvider implements LLMProvider {
     }
   }
 
-  private getMockResponse(messages: LLMMessage[], options: LLMOptions): LLMResponse {
-    return {
-      content: `[MOCK OPENROUTER] This is a mock response for: ${messages[messages.length - 1].content}`,
-      usage: { inputTokens: 100, outputTokens: 50, totalTokens: 150 },
-      model: this.model,
-    }
-  }
 }
 
 const providerInstances: Map<ModelId, LLMProvider> = new Map()
@@ -380,3 +362,6 @@ export async function *streamWithFailover(
 
   yield "Error: All models failed to generate response."
 }
+
+
+

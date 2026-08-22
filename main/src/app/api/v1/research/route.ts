@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { inngest } from "@/lib/inngest"
 
 // GET /api/v1/research - List user's research items
 export async function GET(request: Request) {
@@ -48,7 +49,10 @@ export async function POST(request: Request) {
       },
     })
 
-    await inngestSend(researchItem.id, userId, countryId, committeeId, agendaId, config)
+    await inngest.send({
+      name: "research/started",
+      data: { researchItemId: researchItem.id, userId, countryId, committeeId, agendaId, config },
+    })
 
     return NextResponse.json(
       { data: { researchItemId: researchItem.id, status: researchItem.status } },
@@ -61,19 +65,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-}
-
-async function inngestSend(
-  researchItemId: string,
-  userId: string,
-  countryId: unknown,
-  committeeId: unknown,
-  agendaId: unknown,
-  config: unknown
-) {
-  const { inngest } = await import("@/lib/inngest")
-  await inngest.send({
-    name: "research/started",
-    data: { researchItemId, userId, countryId, committeeId, agendaId, config },
-  })
 }
