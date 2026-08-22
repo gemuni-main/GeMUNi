@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  :root {
+    --background: #F4FAFF;
+    --foreground: #111111;
+    --card: #FFFFFF;
+    --card-fg: #111111;
+    --border: #E5E7EB;
+    --muted: #6B7280;
+    --heading: #1A2A44;
+    --un-logo: #1A2A44;
+  }
+
+  .dark {
+    --background: #0F172A;
+    --foreground: #F1F5F9;
+    --card: #1E293B;
+    --card-fg: #F1F5F9;
+    --border: #334155;
+    --muted: #94A3B8;
+    --heading: #F1F5F9;
+    --un-logo: #CBD5E1;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+.prose { color: var(--muted); }
+.prose h2 { font-size: 1.25rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; color: var(--heading); }
+.prose h3 { font-size: 1.125rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: var(--heading); }
+.prose p { margin-bottom: 0.75rem; line-height: 1.7; }
+.prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+.prose ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+.prose li { margin-bottom: 0.25rem; line-height: 1.6; }
+.prose strong { font-weight: 600; color: var(--heading); }
+.prose a { color: #4DA6FF; text-decoration: underline; }
+.prose a:hover { color: #3B8FEA; }
+.prose blockquote { border-left: 3px solid #4DA6FF; padding-left: 1rem; margin: 1rem 0; color: var(--muted); font-style: italic; }
+.dark .prose code { background: #374151; }
+.prose code { background: #F3F4F6; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875rem; }
+.prose hr { border-color: var(--border); margin: 1.5rem 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-slide-down {
+    animation: none;
+  }
+}

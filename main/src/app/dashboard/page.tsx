@@ -1,215 +1,162 @@
 "use client"
 
-import Image from "next/image"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { ScrollArea } from "@/components/scroll-area"
-import { useState, useEffect } from "react"
+import { Badge } from "@/components/ui/badge"
+import { Navbar } from "@/components/layout/navbar"
+
+const STATUS_BADGE: Record<string, { label: string; variant: "default" | "primary" | "success" | "warning" | "danger" }> = {
+  queued: { label: "Queued", variant: "default" },
+  running: { label: "Running", variant: "primary" },
+  partially_completed: { label: "Partial", variant: "warning" },
+  completed: { label: "Completed", variant: "success" },
+  failed: { label: "Failed", variant: "danger" },
+  cancelled: { label: "Cancelled", variant: "default" },
+}
+
+const TIER_LIMITS = {
+  free: { label: "Free", limit: 5 },
+  plus: { label: "Plus", limit: 20 },
+  pro: { label: "Pro", limit: 100 },
+} as const
 
 export default function Dashboard() {
-  const [userTier, setUserTier] = useState<"free" | "plus" | "pro">("free")
+  const [userTier, setUserTier] = useState<keyof typeof TIER_LIMITS>("free")
   const [dailyUsage, setDailyUsage] = useState(0)
   const [monthlyUsage, setMonthlyUsage] = useState(0)
   const [projects, setProjects] = useState<any[]>([])
-  const [researchItems, setResearchItems] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("/api/v1/account")
-      .then((res) => res.json())
-      .then((data) => setUserTier(data.data.tier || "free"))
-      .catch(() => setUserTier("free"))
+    let active = true
 
-    fetch("/api/v1/account/usage")
-      .then((res) => res.json())
-      .then((data) => {
-        setDailyUsage(data.data.dailyUsage || 0)
-        setMonthlyUsage(data.data.monthlyUsage || 0)
-      })
-      .catch(() => {
-        setDailyUsage(0)
-        setMonthlyUsage(0)
-      })
+    Promise.all([
+      fetch("/api/v1/account").then((r) => r.json()).catch(() => null),
+      fetch("/api/v1/account/usage").then((r) => r.json()).catch(() => null),
+      fetch("/api/v1/projects").then((r) => r.json()).catch(() => null),
+    ]).then(([account, usage, projectsRes]) => {
+      if (!active) return
+      if (account?.data?.tier && account.data.tier in TIER_LIMITS) {
+        setUserTier(account.data.tier)
+      }
+      if (usage?.data) {
+        setDailyUsage(usage.data.dailyUsage || 0)
+        setMonthlyUsage(usage.data.monthlyUsage || 0)
+      }
+      if (projectsRes?.data) setProjects(projectsRes.data)
+      setLoading(false)
+    })
 
-    fetch("/api/v1/projects")
-      .then((res) => res.json())
-      .then((data) => setProjects(data.data || []))
-      .catch(() => setProjects([]))
-
-    fetch("/api/v1/research")
-      .then((res) => res.json())
-      .then((data) => setResearchItems(data.data || []))
-      .catch(() => setResearchItems([]))
+    return () => {
+      active = false
+    }
   }, [])
 
-  const tierInfo = {
-    free: {
-      label: "Free",
-      researchLimit: 5,
-      dailyLimit: 1,
-      color: "bg-gray-100 text-gray-800",
-    },
-    plus: {
-      label: "Plus",
-      researchLimit: 20,
-      dailyLimit: 3,
-      color: "bg-blue-100 text-blue-800",
-    },
-    pro: {
-      label: "Pro",
-      researchLimit: 100,
-      dailyLimit: 10,
-      color: "bg-green-100 text-green-800",
-    },
-  }[userTier]
+  const tier = TIER_LIMITS[userTier]
 
   return (
-    <main className="min-h-screen bg-background">
-      <section className="py-8">
-        <div className="max-w-7xl mx-auto px-4">
-          <header className="mb-8">
-            <h1 className="text-3xl font-bold text-navy mb-2">
-              Welcome to GeMUNi
+    <div className="min-h-screen bg-background">
+      <Navbar />
+
+      <main className="mx-auto max-w-4xl px-4 py-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-accent dark:text-white">
+              Welcome back
             </h1>
-            <p className="text-muted-foreground">
-              Your AI-powered MUN research workspace
+            <p className="mt-1 text-sm text-muted">
+              Pick up where you left off or start new research.
             </p>
-          </header>
+          </div>
+          <Link href="/research">
+            <Button>New Research</Button>
+          </Link>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Usage Card */}
-            <Card className="p-6">
-              <h3 className="text-sm font-medium text-muted-foreground mb-4">
-                Daily Research Use
-              </h3>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  Used today
-                </span>
-                <span className="text-lg font-medium" id="daily-count">
-                  {dailyUsage}
-                </span>
-              </div>
-              <div className="mt-3">
-                <div className="flex text-xxs font-medium mb-1">
-                  <span className="me-2">/{tierInfo?.researchLimit}</span>
-                  <span className={tierInfo?.color}>{tierInfo?.label}</span>
-                </div>
-                <div className="flex-1 h-2 rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-primary"
-                    style={{
-                      width: `${(dailyUsage / tierInfo?.researchLimit) * 100}%`,
-                    }}
-                  ></div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Monthly Usage Card */}
-            <Card className="p-6">
-              <h3 className="text-sm font-medium text-muted-foreground mb-4">
-                Monthly Research Use
-              </h3>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  Used this month
-                </span>
-                <span className="text-lg font-medium">{monthlyUsage}</span>
-              </div>
-              <div className="mt-3">
-                <div className="flex text-xxs font-medium mb-1">
-                  <span className="me-2">/{tierInfo?.researchLimit}</span>
-                  <span className={tierInfo?.color}>{tierInfo?.label}</span>
-                </div>
-                <div className="flex-1 h-2 rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-primary"
-                    style={{
-                      width: `${(monthlyUsage / tierInfo?.researchLimit) * 100}%`,
-                    }}
-                  ></div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Account Tier Card */}
-            <Card className="p-6">
-              <h3 className="text-sm font-medium text-muted-foreground mb-4">
-                Account Tier
-              </h3>
-              <div className="flex items-center">
-                <div
-                  className={tierInfo?.color
-                    ? `${tierInfo?.color} h-6 w-6 rounded-full flex items-center justify-center mx-3`
-                    : "h-6 w-6 rounded-full flex items-center justify-center mx-3"}
-                >
-                  {tierInfo?.label.charAt(0)}
-                </div>
-                <div>
-                  <p className="font-medium">{tierInfo?.label}</p>
-                  <p className="text-xs text-muted-foreground">Tier</p>
-                </div>
-              </div>
-            </Card>
+        {/* Usage strip */}
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="rounded-xl border border-border bg-card p-5">
+            <p className="text-xs text-muted">Today</p>
+            <p className="mt-1 text-2xl font-bold text-accent dark:text-white">
+              {dailyUsage}
+              <span className="text-sm font-medium text-muted">/{tier.limit}</span>
+            </p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-5">
+            <p className="text-xs text-muted">This month</p>
+            <p className="mt-1 text-2xl font-bold text-accent dark:text-white">
+              {monthlyUsage}
+              <span className="text-sm font-medium text-muted">/{tier.limit}</span>
+            </p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-5">
+            <p className="text-xs text-muted">Plan</p>
+            <div className="mt-2">
+              <Badge variant={userTier === "pro" ? "success" : userTier === "plus" ? "primary" : "default"}>
+                {tier.label}
+              </Badge>
+            </div>
           </div>
         </div>
-      </section>
 
-      <section className="py-8">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-navy mb-6">
-            Recent Projects
+        {/* Projects */}
+        <div className="mt-10">
+          <h2 className="text-lg font-semibold text-accent dark:text-white">
+            Recent research
           </h2>
-          {projects.length === 0 ? (
-            <Card className="p-8 text-center">
-              <p className="text-muted-foreground">
-                No research projects yet.
+
+          {loading && <p className="mt-4 text-sm text-muted">Loading…</p>}
+
+          {!loading && projects.length === 0 && (
+            <div className="mt-4 rounded-xl border border-dashed border-gray-300 p-8 text-center dark:border-gray-700">
+              <p className="text-sm text-muted">No research yet.</p>
+              <p className="mt-1 text-sm text-muted opacity-75">
+                Start a new research request to generate your first report.
               </p>
-              <p className="mt-4 text-sm">
-                Start your first MUN research project from the dashboard.
-              </p>
-            </Card>
-          ) : (
-            <ScrollArea>
-              <div className="space-y-4">
-                {projects.map((project) => (
-                  <Card
-                    key={project.id}
-                    className="p-5 hover:transition-colors cursor-pointer"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div
-                        className="w-10 h-10 rounded-md flex-shrink-0 flex items-center justify-center"
-                      >
-                        {project.research_item?.country?.name
-                          ? project.research_item.country.name.substring(0, 2)
-                              .toUpperCase()
-                          : "?"}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">
-                          {project.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {project.research_item?.country?.name} —{" "}
-                          {project.research_item?.committee?.acronym}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </ScrollArea>
+            </div>
           )}
 
-          <div className="mt-6">
-            <Button>
-              New Research
-            </Button>
+          <div className="mt-4 space-y-4">
+            {projects.map((project) => {
+              const badge = STATUS_BADGE[project.status] ?? {
+                label: project.status ?? "Draft",
+                variant: "default" as const,
+              }
+              return (
+                <Link key={project.id} href={`/research/${project.id}`} className="block">
+                  <div className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 transition hover:shadow-sm dark:border-gray-800 dark:bg-zinc-900 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <h3 className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
+                        {project.name || "Untitled research"}
+                      </h3>
+                      <p className="mt-1 truncate text-xs text-gray-500 dark:text-gray-400">
+                        {[
+                          project.country?.name,
+                          project.committee?.acronym,
+                          project.agenda?.title,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ") || "General research"}
+                      </p>
+                      {project.createdAt && (
+                        <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                          {new Date(project.createdAt).toLocaleDateString()} ·{" "}
+                          {new Date(project.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      )}
+                    </div>
+                    <Badge variant={badge.variant}>{badge.label}</Badge>
+                  </div>
+                </Link>
+              )
+            })}
           </div>
         </div>
-      </section>
-    </main>
+      </main>
+    </div>
   )
 }

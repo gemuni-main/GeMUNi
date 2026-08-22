@@ -176,11 +176,14 @@ export default function ResearchProgressPage() {
           </div>
         </Card>
 
-        {progress.status === "completed" && (
+{progress.status === "completed" && (
           <div className="mt-6 text-center">
-            <Button asChild className="w-full md:w-auto">
-              <a href={`/research/${researchId}/report`}>View Report</a>
-            </Button>
+            <a
+              href={`/research/${researchId}/report`}
+              className="inline-flex h-10 items-center justify-center rounded-lg bg-accent px-6 text-sm font-medium text-white transition-colors hover:bg-accent-700 dark:bg-primary dark:hover:bg-primary-600"
+            >
+              View Report
+            </a>
           </div>
         )}
 
