@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
+import { requestPasswordReset } from "@/services/supabase-auth"
 
-// POST /api/v1/auth/password-reset - Request password reset
+// POST /api/v1/auth/password-reset - Send a recovery email
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const { email } = body
+    const body = await request.json().catch(() => null)
+    const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : ""
 
     if (!email) {
       return NextResponse.json(
@@ -13,12 +14,11 @@ export async function POST(request: Request) {
       )
     }
 
-    // In production, send password reset link
-    return NextResponse.json({ success: true }, { status: 200 })
-  } catch (error) {
-    return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "Internal server error" } },
-      { status: 500 }
-    )
+    // Always report success to prevent account enumeration.
+    await requestPasswordReset(email)
+
+    return NextResponse.json({ success: true })
+  } catch {
+    return NextResponse.json({ success: true })
   }
 }

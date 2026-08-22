@@ -1,14 +1,19 @@
 import { NextResponse } from "next/server"
+import { signOut } from "@/services/supabase-auth"
 
-// POST /api/v1/auth/logout - Logout user
+// POST /api/v1/auth/logout - Revoke the session server-side
 export async function POST(request: Request) {
   try {
-    // In production, invalidate session/token
-    return NextResponse.json({ success: true }, { status: 200 })
-  } catch (error) {
-    return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "Internal server error" } },
-      { status: 500 }
-    )
+    const authHeader = request.headers.get("authorization") ?? ""
+    const accessToken = authHeader.startsWith("Bearer ")
+      ? authHeader.slice("Bearer ".length).trim()
+      : ""
+
+    await signOut(accessToken)
+
+    return NextResponse.json({ success: true })
+  } catch {
+    // Logout is idempotent from the client's perspective.
+    return NextResponse.json({ success: true })
   }
 }
